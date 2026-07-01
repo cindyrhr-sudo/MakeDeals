@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deal! - Verhandlungstool</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --teacher-color: #2196f3;
+            --student-color: #ff9800;
+            --deal-color: #4caf50;
+            --text-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Schränke die App auf das Haupt-Layout ein */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        /* ZONEN-LAYOUT */
+        .zone {
+            height: 38vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            background-color: var(--card-bg);
+            transition: background-color 0.3s;
+        }
+
+        /* Der Schüler sitzt gegenüber -> Alles auf den Kopf stellen */
+        .student-zone {
+            transform: rotate(180deg);
+            border-bottom: 2px dashed #333;
+        }
+
+        .teacher-zone {
+            border-top: 2px dashed #333;
+        }
+
+        /* MITTLERE ZONE (Der aktuelle Deal-Status) */
+        .deal-zone {
+            height: 24vh;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* COCKPIT / KONTROLLEN IN DEN ZONEN */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            width: 100%;
+            max-width: 600px;
+            justify-content: space-around;
+        }
+
+        .library {
+            display: flex;
+            gap: 15px;
+        }
+
+        .lib-btn {
+            background: #2a2a2a;
+            border: 2px solid #444;
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .lib-btn.active {
+            border-color: currentColor;
+            background: #333;
+        }
+
+        /* EINGABEFELDER */
+        .input-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .num-display {
+            background: #000;
+            border: 3px solid #444;
+            border-radius: 16px;
+            width: 120px;
+            height: 90px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3.5rem;
+            font-weight: bold;
+            font-family: monospace;
+        }
+
+        .student-zone .num-display { border-color: var(--student-color); color: var(--student-color); }
+        .teacher-zone .num-display { border-color: var(--teacher-color); color: var(--teacher-color); }
+
+        .num-input {
+            width: 120px;
+            background: #2a2a2a;
+            border: 1px solid #555;
+            color: #fff;
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        /* STATUS IN DER MITTE */
+        .status-display {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 20px;
+            border-radius: 12px;
+            min-width: 300px;
+            background: #1a1a1a;
+            border: 1px solid #333;
+        }
+
+        .status-display.match {
+            border-color: var(--deal-color);
+            background: rgba(76, 175, 80, 0.1);
+        }
+
+        .deal-btn {
+            background: var(--deal-color);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 2rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* LIVE WORK-MODUS OVERLAY */
+        .overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.95);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .overlay-content {
+            text-align: center;
+        }
+
+        .overlay-title {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: var(--deal-color);
+        }
+
+        .counter-box {
+            font-size: 8rem;
+            font-weight: bold;
+            margin-bottom: 40px;
+            font-family: monospace;
+        }
+
+        .finish-btn {
+            background: #333;
+            color: #fff;
+            border: 2px solid #555;
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="workspace">
+
+        <!-- SCHÜLER-ZONE (Auf dem Kopf stehend) -->
+        <div class="zone student-zone">
+            <div class="controls">
+                <div class="library" id="student-lib">
+                    <button class="lib-btn" onclick="selectItem('student', '🧱')">🧱</button>
+                    <button class="lib-btn" onclick="selectItem('student', '🎨')">🎨</button>
+                    <button class="lib-btn" onclick="selectItem('student', '🎧')">🎧</button>
+                    <button class="lib-btn" onclick="selectItem('student', '🏃')">🏃</button>
+                </div>
+                <div class="input-wrapper">
+                    <div class="num-display" id="student-display">-</div>
+                    <!-- Nutzt type="number" für den nativen iOS-Ziffernblock -->
+                    <input type="number" class="num-input" id="student-input" placeholder="Zahl" oninput="updateValue('student')">
+                </div>
+            </div>
+        </div>
+
+        <!-- MITTLERE SPLIT-ZONE -->
+        <div class="deal-zone">
+            <div id="status-panel" class="status-display">
+                Wähle Inhalt & Gebote
+            </div>
+            <button id="deal-lock-btn" class="deal-btn" style="display: none;" onclick="startDeal()">DEAL!</button>
+        </div>
+
+        <!-- LEHRER-ZONE (Normal herum) -->
+        <div class="zone teacher-zone">
+            <div class="controls">
+                <div class="input-wrapper">
+                    <div class="num-display" id="teacher-display">-</div>
+                    <input type="number" class="num-input" id="teacher-input" placeholder="Zahl" oninput="updateValue('teacher')">
+                </div>
+                <div class="library" id="teacher-lib">
+                    <button class="lib-btn" onclick="selectItem('teacher', '📝')">📝</button>
+                    <button class="lib-btn" onclick="selectItem('teacher', '🔢')">🔢</button>
+                    <button class="lib-btn" onclick="selectItem('teacher', '📖')">📖</button>
+                    <button class="lib-btn" onclick="selectItem('teacher', '🧹')">🧹</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DER AKTIVE VERTRAGS-BILDSCHIRM -->
+    <div id="deal-overlay" class="overlay">
+        <div class="overlay-content" id="overlay-rotated" style="transform: rotate(0deg);">
+            <div class="overlay-title">ABMACHUNG STEHT!</div>
+            <div id="deal-summary" style="font-size: 2rem; margin-bottom: 20px;"></div>
+            <div class="counter-box" id="active-counter">0</div>
+            <button class="finish-btn" onclick="closeDeal()">Fertig / Beenden</button>
+        </div>
+    </div>
+
+    <script>
+        let state = {
+            teacher: { val: null, item: null },
+            student: { val: null, item: null }
+        };
+
+        function selectItem(role, item) {
+            state[role].item = item;
+            
+            // Visuelles Feedback für die Bibliothek
+            const libContainer = document.getElementById(`${role}-lib`);
+            Array.from(libContainer.children).forEach(btn => {
+                if(btn.innerText === item) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            checkNegotiation();
+        }
+
+        function updateValue(role) {
+            const input = document.getElementById(`${role}-input`);
+            const display = document.getElementById(`${role}-display`);
+            const val = parseInt(input.value);
+
+            if (!isNaN(val) && val >= 0) {
+                state[role].val = val;
+                display.innerText = val;
+            } else {
+                state[role].val = null;
+                display.innerText = "-";
+            }
+
+            checkNegotiation();
+        }
+
+        function checkNegotiation() {
+            const panel = document.getElementById('status-panel');
+            const lockBtn = document.getElementById('deal-lock-btn');
+
+            // Haben beide Seiten ein Icon gewählt und eine Zahl eingetippt?
+            if (state.teacher.val !== null && state.student.val !== null && state.teacher.item && state.student.item) {
+                
+                if (state.teacher.val === state.student.val) {
+                    // Match! Zahlen sind gleich.
+                    panel.style.display = 'none';
+                    lockBtn.style.display = 'block';
+                } else {
+                    // Es wird noch gefeilscht
+                    panel.style.display = 'block';
+                    lockBtn.style.display = 'none';
+                    panel.classList.add('match');
+                    panel.innerHTML = `Feilschen... <br> Lehrer fordert: <b>${state.teacher.val}</b> | Schüler bietet: <b>${state.student.val}</b>`;
+                }
+            } else {
+                // Unvollständig
+                panel.style.display = 'block';
+                lockBtn.style.display = 'none';
+                panel.classList.remove('match');
+                panel.innerText = "Wähle Symbole & tipp deine Zahlen ein";
+            }
+        }
+
+        function startDeal() {
+            const overlay = document.getElementById('deal-overlay');
+            const summary = document.getElementById('deal-summary');
+            const counter = document.getElementById('active-counter');
+            
+            summary.innerHTML = `Erst: <b>${state.teacher.val}x ${state.teacher.item}</b> <br> Dann: <b>${state.student.item}</b>`;
+            counter.innerText = state.teacher.val;
+            
+            overlay.style.display = 'flex';
+        }
+
+        function closeDeal() {
+            // Reset nach dem Deal
+            document.getElementById('deal-overlay').style.display = 'none';
+            state.teacher.val = null; state.student.val = null;
+            document.getElementById('teacher-input').value = '';
+            document.getElementById('student-input').value = '';
+            document.getElementById('teacher-display').innerText = '-';
+            document.getElementById('student-display').innerText = '-';
+            
+            // Bibliothek-Klassen zurücksetzen
+            document.querySelectorAll('.lib-btn').forEach(b => b.classList.remove('active'));
+            
+            checkNegotiation();
+        }
+    </script>
+</body>
+</html>
