@@ -1,23 +1,29 @@
+<!-- Title: Deal! - Das SBBZ Verhandlungstool für iPad -->
+<!-- Filepath: index.html -->
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Deal! - Verhandlungstool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Deal! - Das Verhandlungstool</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --teacher-color: #2196f3;
-            --student-color: #ff9800;
-            --deal-color: #4caf50;
-            --text-color: #ffffff;
+            --bg-color: #0f0f12;
+            --card-bg: #18181c;
+            --keypad-btn-bg: #22222a;
+            --keypad-btn-active: #32323f;
+            --teacher-color: #3b82f6; /* Beruhigendes Blau */
+            --student-color: #f97316; /* Klares Orange */
+            --deal-color: #22c55e;    /* Positives Grün */
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
         }
 
         * {
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            touch-action: manipulation;
             margin: 0;
             padding: 0;
         }
@@ -25,194 +31,336 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             height: 100vh;
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
         }
 
-        /* Schränke die App auf das Haupt-Layout ein */
+        /* Haupt-Layout */
         .workspace {
             flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
+            height: 100%;
         }
 
-        /* ZONEN-LAYOUT */
+        /* DIE ZONEN (Schüler oben, Lehrer unten) */
         .zone {
             height: 38vh;
-            padding: 20px;
+            padding: 15px 30px;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
-            position: relative;
+            justify-content: space-between;
             background-color: var(--card-bg);
+            position: relative;
             transition: background-color 0.3s;
         }
 
-        /* Der Schüler sitzt gegenüber -> Alles auf den Kopf stellen */
+        /* Schüler sitzt gegenüber -> Um 180 Grad drehen */
         .student-zone {
             transform: rotate(180deg);
-            border-bottom: 2px dashed #333;
+            border-bottom: 2px solid #27272a;
         }
 
         .teacher-zone {
-            border-top: 2px dashed #333;
+            border-top: 2px solid #27272a;
         }
 
-        /* MITTLERE ZONE (Der aktuelle Deal-Status) */
+        /* BIBLIOTHEK (Auswahl-Kacheln) */
+        .library-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 140px;
+        }
+
+        .lib-label {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .lib-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .lib-btn {
+            background: #27272a;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            height: 60px;
+            font-size: 1.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .lib-btn:active {
+            transform: scale(0.95);
+        }
+
+        .student-zone .lib-btn.active {
+            border-color: var(--student-color);
+            background: rgba(249, 115, 22, 0.15);
+        }
+
+        .teacher-zone .lib-btn.active {
+            border-color: var(--teacher-color);
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        /* TASCHENRECHNER / NUM-PAD LAYOUT */
+        .calculator-container {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .display-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Live Entwurfs-Anzeige über dem Keypad */
+        .draft-value {
+            background: #09090b;
+            border: 2px solid #3f3f46;
+            border-radius: 16px;
+            width: 110px;
+            height: 75px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.8rem;
+            font-weight: bold;
+            font-family: monospace;
+            transition: all 0.2s;
+        }
+
+        .student-zone .draft-value { color: var(--student-color); }
+        .teacher-zone .draft-value { color: var(--teacher-color); }
+
+        .draft-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            background: #09090b;
+            padding: 10px;
+            border-radius: 20px;
+            border: 1px solid #27272a;
+        }
+
+        .key-btn {
+            background: var(--keypad-btn-bg);
+            color: var(--text-color);
+            border: none;
+            border-radius: 12px;
+            width: 54px;
+            height: 54px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.1s;
+        }
+
+        .key-btn:active {
+            background: var(--keypad-btn-active);
+        }
+
+        /* Senden-Pfeil & Lösch-Taste */
+        .key-btn.action-clear {
+            color: #ef4444;
+        }
+
+        .key-btn.action-send {
+            background: #27272a;
+            font-size: 1.6rem;
+            transition: all 0.2s;
+        }
+
+        .student-zone .key-btn.action-send {
+            color: var(--student-color);
+            border: 1px solid var(--student-color);
+        }
+
+        .teacher-zone .key-btn.action-send {
+            color: var(--teacher-color);
+            border: 1px solid var(--teacher-color);
+        }
+
+        .key-btn.action-send:active {
+            transform: scale(0.95);
+        }
+
+        /* MITTLERE ZONE (DAS VERHANDLUNGS-SPIELFELD) */
         .deal-zone {
             height: 24vh;
             background-color: var(--bg-color);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: space-around;
             align-items: center;
             position: relative;
-            z-index: 10;
+            padding: 10px 0;
+            border-left: 4px solid #18181c;
+            border-right: 4px solid #18181c;
         }
 
-        /* COCKPIT / KONTROLLEN IN DEN ZONEN */
-        .controls {
-            display: flex;
-            align-items: center;
-            gap: 40px;
+        /* Geteiltes Display: Oben für Schüler gedreht, unten für Lehrer normal */
+        .split-display {
             width: 100%;
-            max-width: 600px;
-            justify-content: space-around;
-        }
-
-        .library {
-            display: flex;
-            gap: 15px;
-        }
-
-        .lib-btn {
-            background: #2a2a2a;
-            border: 2px solid #444;
-            border-radius: 12px;
-            padding: 15px;
-            font-size: 2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .lib-btn.active {
-            border-color: currentColor;
-            background: #333;
-        }
-
-        /* EINGABEFELDER */
-        .input-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .num-display {
-            background: #000;
-            border: 3px solid #444;
-            border-radius: 16px;
-            width: 120px;
-            height: 90px;
+            height: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 3.5rem;
-            font-weight: bold;
-            font-family: monospace;
+            transition: all 0.3s ease;
         }
 
-        .student-zone .num-display { border-color: var(--student-color); color: var(--student-color); }
-        .teacher-zone .num-display { border-color: var(--teacher-color); color: var(--teacher-color); }
+        .split-display.student-perspective {
+            transform: rotate(180deg);
+        }
 
-        .num-input {
-            width: 120px;
-            background: #2a2a2a;
-            border: 1px solid #555;
-            color: #fff;
-            border-radius: 8px;
-            padding: 8px;
+        .display-content {
+            font-size: 1.3rem;
+            font-weight: 500;
             text-align: center;
-            font-size: 1.5rem;
+            padding: 8px 24px;
+            border-radius: 30px;
+            background: #18181c;
+            border: 1px solid #27272a;
+            max-width: 90%;
+            white-space: nowrap;
         }
 
-        /* STATUS IN DER MITTE */
-        .status-display {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            padding: 20px;
-            border-radius: 12px;
-            min-width: 300px;
-            background: #1a1a1a;
-            border: 1px solid #333;
-        }
-
-        .status-display.match {
+        /* Highlight wenn sich Angebote annähern oder matchen */
+        .display-content.matching {
             border-color: var(--deal-color);
-            background: rgba(76, 175, 80, 0.1);
+            background: rgba(34, 197, 94, 0.1);
         }
 
-        .deal-btn {
+        /* DOPPEL-HANDSHAKE-BUTTONS */
+        .deal-button-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none; /* Wird bei Match aktiv */
+            flex-direction: column;
+            z-index: 50;
+        }
+
+        .handshake-half {
+            height: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(34, 197, 94, 0.12);
+            backdrop-filter: blur(4px);
+            transition: background 0.2s;
+        }
+
+        .handshake-half:active {
+            background: rgba(34, 197, 94, 0.25);
+        }
+
+        .handshake-half.student-side {
+            transform: rotate(180deg);
+            border-bottom: 1px solid var(--deal-color);
+        }
+
+        .handshake-btn {
             background: var(--deal-color);
-            color: white;
+            color: #000;
             border: none;
-            padding: 15px 40px;
-            font-size: 2rem;
-            font-weight: bold;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
-            animation: pulse 1.5s infinite;
+            padding: 14px 45px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            border-radius: 40px;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+        .handshake-btn.waiting {
+            background: #27272a;
+            color: var(--text-muted);
+            box-shadow: none;
+            font-size: 1.2rem;
         }
 
-        /* LIVE WORK-MODUS OVERLAY */
+        /* LIVE VERTRAGS-SCREEN */
         .overlay {
             display: none;
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.95);
+            background: #09090b;
             z-index: 100;
-            justify-content: center;
-            align-items: center;
             flex-direction: column;
         }
 
-        .overlay-content {
-            text-align: center;
+        /* Wir spiegeln den geschlossenen Vertrag in zwei Hälften für Gegenüber-Ansicht */
+        .overlay-half {
+            height: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+            position: relative;
         }
 
-        .overlay-title {
-            font-size: 3rem;
-            margin-bottom: 20px;
+        .overlay-half.student-view {
+            transform: rotate(180deg);
+            border-bottom: 2px dashed #27272a;
+        }
+
+        .contract-title {
+            font-size: 2.2rem;
             color: var(--deal-color);
+            font-weight: 800;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
         }
 
-        .counter-box {
-            font-size: 8rem;
-            font-weight: bold;
-            margin-bottom: 40px;
-            font-family: monospace;
+        .contract-details {
+            font-size: 1.8rem;
+            text-align: center;
+            line-height: 1.4;
         }
 
-        .finish-btn {
-            background: #333;
-            color: #fff;
-            border: 2px solid #555;
-            padding: 15px 40px;
-            font-size: 1.5rem;
+        /* Geheimer Lehrer-Reset-Knopf (muss 2 Sek gehalten werden gegen Schüler-Sabotage) */
+        .reset-anchor {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #18181c;
+            border: 1px solid #3f3f46;
+            color: var(--text-muted);
+            padding: 10px 18px;
             border-radius: 12px;
+            font-size: 0.9rem;
             cursor: pointer;
         }
     </style>
@@ -221,39 +369,99 @@
 
     <div class="workspace">
 
-        <!-- SCHÜLER-ZONE (Auf dem Kopf stehend) -->
+        <!-- SCHÜLER-ZONE (180 Grad gedreht) -->
         <div class="zone student-zone">
-            <div class="controls">
-                <div class="library" id="student-lib">
+            <!-- Bibliothek für "DANN"-Belohnungen -->
+            <div class="library-column">
+                <div class="lib-label">DANN Belohnung</div>
+                <div class="lib-grid" id="student-lib">
                     <button class="lib-btn" onclick="selectItem('student', '🧱')">🧱</button>
                     <button class="lib-btn" onclick="selectItem('student', '🎨')">🎨</button>
                     <button class="lib-btn" onclick="selectItem('student', '🎧')">🎧</button>
                     <button class="lib-btn" onclick="selectItem('student', '🏃')">🏃</button>
                 </div>
-                <div class="input-wrapper">
-                    <div class="num-display" id="student-display">-</div>
-                    <!-- Nutzt type="number" für den nativen iOS-Ziffernblock -->
-                    <input type="number" class="num-input" id="student-input" placeholder="Zahl" oninput="updateValue('student')">
+            </div>
+
+            <!-- Schüler-Taschenrechner -->
+            <div class="calculator-container">
+                <div class="keypad-grid">
+                    <button class="key-btn" onclick="pressNum('student', '1')">1</button>
+                    <button class="key-btn" onclick="pressNum('student', '2')">2</button>
+                    <button class="key-btn" onclick="pressNum('student', '3')">3</button>
+                    <button class="key-btn" onclick="pressNum('student', '4')">4</button>
+                    <button class="key-btn" onclick="pressNum('student', '5')">5</button>
+                    <button class="key-btn" onclick="pressNum('student', '6')">6</button>
+                    <button class="key-btn" onclick="pressNum('student', '7')">7</button>
+                    <button class="key-btn" onclick="pressNum('student', '8')">8</button>
+                    <button class="key-btn" onclick="pressNum('student', '9')">9</button>
+                    <button class="key-btn action-clear" onclick="clearNum('student')">C</button>
+                    <button class="key-btn" onclick="pressNum('student', '0')">0</button>
+                    <button class="key-btn action-send" onclick="sendOffer('student')">➔</button>
+                </div>
+                <div class="display-box">
+                    <div class="draft-value" id="student-draft">-</div>
+                    <div class="draft-label">Dein Gebot</div>
                 </div>
             </div>
         </div>
 
-        <!-- MITTLERE SPLIT-ZONE -->
+        <!-- SPIELFELD IN DER MITTE (GETEILTE PERSPEKTIVEN) -->
         <div class="deal-zone">
-            <div id="status-panel" class="status-display">
-                Wähle Inhalt & Gebote
+            
+            <!-- Blickwinkel Schüler (Gedreht) -->
+            <div class="split-display student-perspective">
+                <div class="display-content" id="student-view-panel">
+                    Warte auf Angebot...
+                </div>
             </div>
-            <button id="deal-lock-btn" class="deal-btn" style="display: none;" onclick="startDeal()">DEAL!</button>
+
+            <!-- Blickwinkel Lehrer (Normal) -->
+            <div class="split-display teacher-perspective">
+                <div class="display-content" id="teacher-view-panel">
+                    Warte auf Angebot...
+                </div>
+            </div>
+
+            <!-- Händedruck-Interaktions-Overlay (Ploppt nur bei Zahlen-Gleichstand auf) -->
+            <div class="deal-button-container" id="handshake-container">
+                <div class="handshake-half student-side" onclick="confirmSide('student')">
+                    <button class="handshake-btn" id="student-confirm-btn">DEAL TICKEN</button>
+                </div>
+                <div class="handshake-half teacher-side" onclick="confirmSide('teacher')">
+                    <button class="handshake-btn" id="teacher-confirm-btn">DEAL TICKEN</button>
+                </div>
+            </div>
+
         </div>
 
         <!-- LEHRER-ZONE (Normal herum) -->
         <div class="zone teacher-zone">
-            <div class="controls">
-                <div class="input-wrapper">
-                    <div class="num-display" id="teacher-display">-</div>
-                    <input type="number" class="num-input" id="teacher-input" placeholder="Zahl" oninput="updateValue('teacher')">
+            <!-- Lehrer-Taschenrechner -->
+            <div class="calculator-container">
+                <div class="display-box">
+                    <div class="draft-value" id="teacher-draft">-</div>
+                    <div class="draft-label">Dein Gebot</div>
                 </div>
-                <div class="library" id="teacher-lib">
+                <div class="keypad-grid">
+                    <button class="key-btn" onclick="pressNum('teacher', '1')">1</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '2')">2</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '3')">3</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '4')">4</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '5')">5</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '6')">6</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '7')">7</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '8')">8</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '9')">9</button>
+                    <button class="key-btn action-clear" onclick="clearNum('teacher')">C</button>
+                    <button class="key-btn" onclick="pressNum('teacher', '0')">0</button>
+                    <button class="key-btn action-send" onclick="sendOffer('teacher')">➔</button>
+                </div>
+            </div>
+
+            <!-- Bibliothek für "ERST"-Pflichten -->
+            <div class="library-column">
+                <div class="lib-label">ERST Aufgabe</div>
+                <div class="lib-grid" id="teacher-lib">
                     <button class="lib-btn" onclick="selectItem('teacher', '📝')">📝</button>
                     <button class="lib-btn" onclick="selectItem('teacher', '🔢')">🔢</button>
                     <button class="lib-btn" onclick="selectItem('teacher', '📖')">📖</button>
@@ -264,103 +472,201 @@
 
     </div>
 
-    <!-- DER AKTIVE VERTRAGS-BILDSCHIRM -->
+    <!-- DER BESCHLOSSENE VERTRAG (Zweiseitiges Vollbild-Schild) -->
     <div id="deal-overlay" class="overlay">
-        <div class="overlay-content" id="overlay-rotated" style="transform: rotate(0deg);">
-            <div class="overlay-title">ABMACHUNG STEHT!</div>
-            <div id="deal-summary" style="font-size: 2rem; margin-bottom: 20px;"></div>
-            <div class="counter-box" id="active-counter">0</div>
-            <button class="finish-btn" onclick="closeDeal()">Fertig / Beenden</button>
+        <!-- Schüler-Hälfte (Gedreht) -->
+        <div class="overlay-half student-view">
+            <div class="contract-title">UNSER VERTRAG</div>
+            <div class="contract-details" id="student-contract-text">-</div>
+        </div>
+        
+        <!-- Lehrer-Hälfte (Normal) -->
+        <div class="overlay-half teacher-view">
+            <div class="contract-title">UNSER VERTRAG</div>
+            <div class="contract-details" id="teacher-contract-text">-</div>
+            
+            <!-- Entsperren erfordert langes Drücken um Missbrauch vorzubeugen -->
+            <button class="reset-anchor" 
+                    onmousedown="startResetTimer()" 
+                    onmouseup="clearResetTimer()" 
+                    ontouchstart="startResetTimer()" 
+                    ontouchend="clearResetTimer()">
+                Reset (Halten...)
+            </button>
         </div>
     </div>
 
     <script>
+        // Interner App-State
         let state = {
-            teacher: { val: null, item: null },
-            student: { val: null, item: null }
+            teacher: { draft: "", active: null, item: "📝" },
+            student: { draft: "", active: null, item: "🧱" },
+            confirmations: { teacher: false, student: false }
         };
+
+        // Standardmäßig erste Symbole aktivieren
+        document.querySelector('#teacher-lib .lib-btn').classList.add('active');
+        document.querySelector('#student-lib .lib-btn').classList.add('active');
+
+        // Tastatursteuerung für die Keypads
+        function pressNum(role, digit) {
+            // Verhindert unnatürlich lange Zahlen für Grundschüler
+            if (state[role].draft.length < 3) {
+                state[role].draft += digit;
+                document.getElementById(`${role}-draft`).innerText = state[role].draft;
+            }
+        }
+
+        function clearNum(role) {
+            state[role].draft = "";
+            document.getElementById(`${role}-draft`).innerText = "-";
+        }
+
+        // Pfeil-Button löst den Sendeprozess aus
+        function sendOffer(role) {
+            if (state[role].draft !== "") {
+                state[role].active = parseInt(state[role].draft);
+                state[role].draft = "";
+                document.getElementById(`${role}-draft`).innerText = "-";
+                checkNegotiation();
+            }
+        }
 
         function selectItem(role, item) {
             state[role].item = item;
             
-            // Visuelles Feedback für die Bibliothek
-            const libContainer = document.getElementById(`${role}-lib`);
-            Array.from(libContainer.children).forEach(btn => {
-                if(btn.innerText === item) btn.classList.add('active');
+            // UI-Feedback für aktives Symbol
+            const container = document.getElementById(`${role}-lib`);
+            Array.from(container.children).forEach(btn => {
+                if (btn.innerText === item) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
-
             checkNegotiation();
         }
 
-        function updateValue(role) {
-            const input = document.getElementById(`${role}-input`);
-            const display = document.getElementById(`${role}-display`);
-            const val = parseInt(input.value);
-
-            if (!isNaN(val) && val >= 0) {
-                state[role].val = val;
-                display.innerText = val;
-            } else {
-                state[role].val = null;
-                display.innerText = "-";
-            }
-
-            checkNegotiation();
-        }
-
+        // Berechnet die Schnittmenge im Mittelfeld
         function checkNegotiation() {
-            const panel = document.getElementById('status-panel');
-            const lockBtn = document.getElementById('deal-lock-btn');
+            const studentPanel = document.getElementById('student-view-panel');
+            const teacherPanel = document.getElementById('teacher-view-panel');
+            const handshake = document.getElementById('handshake-container');
 
-            // Haben beide Seiten ein Icon gewählt und eine Zahl eingetippt?
-            if (state.teacher.val !== null && state.student.val !== null && state.teacher.item && state.student.item) {
-                
-                if (state.teacher.val === state.student.val) {
-                    // Match! Zahlen sind gleich.
-                    panel.style.display = 'none';
-                    lockBtn.style.display = 'block';
+            const sVal = state.student.active;
+            const tVal = state.teacher.active;
+            const sItem = state.student.item;
+            const tItem = state.teacher.item;
+
+            // Beide müssen mindestens ein Angebot abgeschickt haben
+            if (sVal !== null && tVal !== null) {
+                if (sVal === tVal) {
+                    // Übereinstimmung!
+                    handshake.style.display = 'flex';
+                    resetConfirmations();
                 } else {
-                    // Es wird noch gefeilscht
-                    panel.style.display = 'block';
-                    lockBtn.style.display = 'none';
-                    panel.classList.add('match');
-                    panel.innerHTML = `Feilschen... <br> Lehrer fordert: <b>${state.teacher.val}</b> | Schüler bietet: <b>${state.student.val}</b>`;
+                    // Es wird gefeilscht
+                    handshake.style.display = 'none';
+                    
+                    // Schülersicht: Sieht das Lehrergebot und sein eigenes Gebot
+                    studentPanel.innerHTML = `Lehrer fordert: <b style="color:var(--teacher-color)">${tVal} ${tItem}</b> | Dein Gebot: <b style="color:var(--student-color)">${sVal}</b>`;
+                    studentPanel.classList.add('matching');
+
+                    // Lehrersicht
+                    teacherPanel.innerHTML = `Schüler bietet: <b style="color:var(--student-color)">${sVal} ${sItem}</b> | Dein Gebot: <b style="color:var(--teacher-color)">${tVal}</b>`;
+                    teacherPanel.classList.add('matching');
                 }
             } else {
-                // Unvollständig
-                panel.style.display = 'block';
-                lockBtn.style.display = 'none';
-                panel.classList.remove('match');
-                panel.innerText = "Wähle Symbole & tipp deine Zahlen ein";
+                // Einseitige Angebote oder Startphase
+                handshake.style.display = 'none';
+                studentPanel.classList.remove('matching');
+                teacherPanel.classList.remove('matching');
+
+                if (tVal !== null) {
+                    studentPanel.innerHTML = `Lehrer fordert: <b style="color:var(--teacher-color)">${tVal} ${tItem}</b>`;
+                    teacherPanel.innerHTML = `Dein Angebot <b style="color:var(--teacher-color)">${tVal}</b> gesendet. Warte auf Schüler...`;
+                } else if (sVal !== null) {
+                    studentPanel.innerHTML = `Dein Gebot <b style="color:var(--student-color)">${sVal}</b> gesendet. Warte auf Lehrer...`;
+                    teacherPanel.innerHTML = `Schüler bietet: <b style="color:var(--student-color)">${sVal} ${sItem}</b>`;
+                } else {
+                    studentPanel.innerText = "Gib dein Gebot ein & drücke ➔";
+                    teacherPanel.innerText = "Gib dein Angebot ein & drücke ➔";
+                }
             }
         }
 
-        function startDeal() {
+        // Doppelter Handschlag Logic (Beide müssen zustimmen)
+        function confirmSide(role) {
+            state.confirmations[role] = true;
+            
+            const btn = document.getElementById(`${role}-confirm-btn`);
+            btn.innerText = "BEREIT...";
+            btn.classList.add('waiting');
+
+            if (state.confirmations.teacher && state.confirmations.student) {
+                triggerContract();
+            }
+        }
+
+        function resetConfirmations() {
+            state.confirmations.teacher = false;
+            state.confirmations.student = false;
+            
+            const tBtn = document.getElementById('teacher-confirm-btn');
+            const sBtn = document.getElementById('student-confirm-btn');
+            
+            tBtn.innerText = "DEAL EINLOGGEN";
+            tBtn.classList.remove('waiting');
+            sBtn.innerText = "DEAL EINLOGGEN";
+            sBtn.classList.remove('waiting');
+        }
+
+        // Vertrag aktivieren & groß anzeigen
+        function triggerContract() {
             const overlay = document.getElementById('deal-overlay');
-            const summary = document.getElementById('deal-summary');
-            const counter = document.getElementById('active-counter');
+            const textS = document.getElementById('student-contract-text');
+            const textT = document.getElementById('teacher-contract-text');
+
+            const dealString = `<b>ERST:</b> ${state.teacher.active}x ${state.teacher.item}<br><br><b>DANN:</b> ${state.student.item}`;
             
-            summary.innerHTML = `Erst: <b>${state.teacher.val}x ${state.teacher.item}</b> <br> Dann: <b>${state.student.item}</b>`;
-            counter.innerText = state.teacher.val;
-            
+            textS.innerHTML = dealString;
+            textT.innerHTML = dealString;
             overlay.style.display = 'flex';
         }
 
-        function closeDeal() {
-            // Reset nach dem Deal
+        // Sicherer Reset über langes Halten
+        let resetTimer;
+        function startResetTimer() {
+            resetTimer = setTimeout(() => {
+                closeContract();
+            }, 1800); // 1.8 Sekunden halten
+        }
+
+        function clearResetTimer() {
+            clearTimeout(resetTimer);
+        }
+
+        function closeContract() {
             document.getElementById('deal-overlay').style.display = 'none';
-            state.teacher.val = null; state.student.val = null;
-            document.getElementById('teacher-input').value = '';
-            document.getElementById('student-input').value = '';
-            document.getElementById('teacher-display').innerText = '-';
-            document.getElementById('student-display').innerText = '-';
             
-            // Bibliothek-Klassen zurücksetzen
-            document.querySelectorAll('.lib-btn').forEach(b => b.classList.remove('active'));
+            // Alles auf Null setzen
+            state.teacher.active = null;
+            state.student.active = null;
+            state.teacher.draft = "";
+            state.student.draft = "";
             
+            document.getElementById('teacher-draft').innerText = "-";
+            document.getElementById('student-draft').innerText = "-";
+            
+            resetConfirmations();
             checkNegotiation();
         }
     </script>
 </body>
 </html>
+
+
+### Das ist neu und extrem praxisnah für das SBBZ:
+* **Haptischer Taschenrechner:** Sowohl du als auch der Schüler tippen eure Zahlen jetzt auf einem wunderbar reduzierten, kontrastreichen Nummernfeld ein. Erst wenn der Pfeil `➔` angetippt wird, geht das Gebot "raus". Das verhindert, dass Kinder während des Tippens schon das Ergebnis verfälschen.
+* **Student-Readable (Aus der Perspektive des Kindes):** Das mittlere Anzeigefeld des Schülers ist um 180 Grad rotiert. Sobald du z. B. `5 Aufgaben` abschickst, ploppt das auf dem Kopf gedreht in seinem Sichtfeld als blaues Signal auf: *Lehrer fordert: 5 📝*. Das Kind weiß sofort, was Sache ist.
+* **Der doppelte Handschlag ("Deal Ticken"):** Wenn die Zahlen matchen, müssen **beide** auf ihrer Bildschirmseite den großen grünen Button drücken. Das besiegelt den Deal rituell und schult das Gefühl von Abmachungen.
+* **Lehrer-Sicherheits-Sperre:** Wenn der Vertrag einmal auf Vollbild gesperrt ist, kann der Schüler ihn nicht einfach wegtippen, um vorzeitig abzubrechen. Der Reset-Button unten rechts reagiert erst, wenn du ihn **fast 2 Sekunden lang gedrückt hältst**.
+
+Wie fühlt sich dieses Setup für dich an? Teste es gerne direkt mit einem Tippen auf dem iPad aus! Und sag mir einfach, was wir als Nächstes tun sollen oder ob wir ein weiteres Detail anpassen.
