@@ -161,19 +161,16 @@
 
         .manage-row { background: var(--panel-soft); border: 1px solid var(--border-soft); }
 
-        #orientationNotice { display: none; }
-        @media (orientation: portrait) and (max-width: 1366px) {
-            #orientationNotice { display: flex; }
-            #appRoot { display: none; }
-        }
+        /* Ausrichtung wird per JS geprüft (Breite vs. Höhe), nicht per CSS-Media-Query,
+           da 'orientation' in eingebetteten Vorschaufenstern unzuverlässig ist. */
     </style>
 </head>
 <body class="relative flex flex-col justify-between items-stretch p-2 h-screen w-screen overflow-hidden">
 
     <div id="orientationNotice" class="hidden absolute inset-0 z-[999] flex-col items-center justify-center gap-4 text-center px-8" style="background: var(--bg);">
         <i class="fa-solid fa-tablet-screen-button text-5xl" style="color: var(--ink-dim);"></i>
-        <p class="text-xl font-bold" style="color: var(--ink);">Bitte das iPad ins Querformat drehen</p>
-        <p class="text-sm" style="color: var(--ink-dim);">Lern-Deal ist für die Nutzung quer auf dem Tisch gestaltet.</p>
+        <p class="text-xl font-bold" style="color: var(--ink);">Bitte das iPad ins Hochformat drehen</p>
+        <p class="text-sm" style="color: var(--ink-dim);">Lern-Deal ist für die Nutzung im Hochformat auf dem Tisch gestaltet.</p>
     </div>
 
     <div id="appRoot" class="h-full w-full flex flex-col justify-between items-stretch relative">
@@ -186,7 +183,7 @@
     <div id="negotiationScreen" class="h-full w-full flex flex-col justify-between items-stretch transition-all duration-500">
 
         <!-- ==================== SCHÜLER-BEREICH (OBEN - 180° gedreht) ==================== -->
-        <div class="zone-student h-[37.5%] w-full rounded-3xl p-4 flex flex-col justify-between upside-down relative overflow-hidden">
+        <div class="zone-student flex-1 min-h-0 w-full rounded-3xl p-4 flex flex-col justify-between upside-down relative overflow-hidden">
 
             <div class="bar-student w-full py-1.5 px-3 rounded-xl flex items-center justify-center text-center">
                 <span id="studentLiveFormula" class="text-sm font-bold tracking-wide flex items-center gap-1.5 justify-center">
@@ -194,61 +191,59 @@
                 </span>
             </div>
 
-            <div class="flex gap-4 items-center justify-between my-auto h-[55%] z-10">
+            <div class="flex gap-3 items-center justify-between flex-1 min-h-0 z-10">
 
                 <div class="w-1/2 h-full flex flex-col justify-center">
-                    <div id="studentRewardPlaceholder" class="text-sm font-bold text-center py-4 rounded-2xl" style="color: var(--ink-faint); background: var(--panel-soft); border: 1px solid var(--border-soft);">
+                    <div id="studentRewardPlaceholder" class="text-sm font-bold text-center py-3 rounded-2xl" style="color: var(--ink-faint); background: var(--panel-soft); border: 1px solid var(--border-soft);">
                         Warte auf Lehrer-Freigabe...
                     </div>
-                    <div id="studentRewardGrid" class="hidden grid grid-cols-2 gap-3"></div>
+                    <div id="studentRewardGrid" class="hidden grid grid-cols-2 gap-2"></div>
                 </div>
 
-                <div class="w-1/2 h-full flex gap-4 items-center justify-end">
-                    <div class="flex flex-col items-center justify-center">
-                        <div class="draft-student rounded-2xl px-5 py-3 text-5xl font-black min-w-[100px] text-center">
-                            <span id="studentDraft">0</span>
-                        </div>
-                        <span id="studentUnitIndicator" class="text-xs font-bold mt-1.5 uppercase" style="color: var(--student);">--</span>
+                <div class="w-1/2 h-full flex flex-col gap-2 items-center justify-center">
+                    <div class="draft-student rounded-2xl px-5 py-2 text-4xl font-black min-w-[100px] text-center">
+                        <span id="studentDraft">0</span>
                     </div>
+                    <span id="studentUnitIndicator" class="text-xs font-bold uppercase" style="color: var(--student);">--</span>
 
-                    <button onclick="commitStudent()" class="btn-submit-student w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl active:scale-95 transition-all">
+                    <button onclick="commitStudent()" class="btn-submit-student w-full max-w-[140px] h-12 rounded-2xl flex items-center justify-center font-black text-2xl active:scale-95 transition-all">
                         <i class="fa-solid fa-arrow-down rotate-180"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center gap-4 h-[25%] z-10 border-t pt-2" style="border-color: var(--student-soft-border);">
-                <div id="studentThumbsUpContainer" class="invisible w-1/4 flex justify-start">
-                    <button onclick="toggleStudentAccept()" id="studentThumbsUpBtn" class="thumb-btn px-6 py-2.5 rounded-2xl flex items-center gap-3 font-bold text-lg active:scale-95 transition-all">
-                        <i class="fa-solid fa-thumbs-up text-xl"></i>
+            <div class="flex justify-between items-end gap-3 z-10 shrink-0 border-t pt-2" style="border-color: var(--student-soft-border);">
+                <div id="studentThumbsUpContainer" class="invisible flex justify-start">
+                    <button onclick="toggleStudentAccept()" id="studentThumbsUpBtn" class="thumb-btn px-5 py-2 rounded-2xl flex items-center gap-2 font-bold text-base active:scale-95 transition-all">
+                        <i class="fa-solid fa-thumbs-up text-lg"></i>
                         <span>OK!</span>
                     </button>
                 </div>
 
-                <div class="flex-1 flex gap-2 justify-end">
-                    <button onclick="pressStudentKey('1')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">1</button>
-                    <button onclick="pressStudentKey('2')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">2</button>
-                    <button onclick="pressStudentKey('3')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">3</button>
-                    <button onclick="pressStudentKey('4')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">4</button>
-                    <button onclick="pressStudentKey('5')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">5</button>
-                    <button onclick="pressStudentKey('6')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">6</button>
-                    <button onclick="pressStudentKey('7')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">7</button>
-                    <button onclick="pressStudentKey('8')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">8</button>
-                    <button onclick="pressStudentKey('9')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">9</button>
-                    <button onclick="pressStudentKey('0')" class="key-btn w-14 h-12 rounded-xl font-bold text-xl transition-colors">0</button>
-                    <button onclick="pressStudentKey('back')" class="key-warn w-14 h-12 rounded-xl font-bold text-lg transition-all"><i class="fa-solid fa-delete-left"></i></button>
-                    <button onclick="clearStudentDraft()" class="key-danger w-14 h-12 rounded-xl font-bold text-lg transition-all">C</button>
+                <div class="grid grid-cols-3 gap-1.5 ml-auto">
+                    <button onclick="pressStudentKey('1')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">1</button>
+                    <button onclick="pressStudentKey('2')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">2</button>
+                    <button onclick="pressStudentKey('3')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">3</button>
+                    <button onclick="pressStudentKey('4')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">4</button>
+                    <button onclick="pressStudentKey('5')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">5</button>
+                    <button onclick="pressStudentKey('6')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">6</button>
+                    <button onclick="pressStudentKey('7')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">7</button>
+                    <button onclick="pressStudentKey('8')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">8</button>
+                    <button onclick="pressStudentKey('9')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">9</button>
+                    <button onclick="pressStudentKey('back')" class="key-warn w-14 h-12 rounded-xl font-bold text-base transition-all"><i class="fa-solid fa-delete-left"></i></button>
+                    <button onclick="pressStudentKey('0')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">0</button>
+                    <button onclick="clearStudentDraft()" class="key-danger w-14 h-12 rounded-xl font-bold text-base transition-all">C</button>
                 </div>
             </div>
         </div>
 
         <!-- ==================== MITTLERES VERHANDLUNGSFELD ==================== -->
-        <div class="zone-middle h-[25%] w-full flex flex-col justify-center items-center p-3 relative z-20 upside-down">
+        <div class="zone-middle shrink-0 w-full flex flex-col justify-center items-center p-3 relative z-20 upside-down">
 
             <div class="z-10 flex w-full justify-around items-center my-auto">
                 <div class="card-teacher flex flex-col items-center p-4 rounded-2xl w-5/12">
                     <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Lehrkraft fordert:</span>
-                    <span id="activeLehrerSoll" class="text-2xl font-extrabold mt-1.5 flex items-center gap-2" style="color: var(--teacher-strong);">--</span>
+                    <span id="activeLehrerSoll" class="text-xl font-extrabold mt-1.5 flex items-center gap-1 flex-wrap justify-center" style="color: var(--teacher-strong);">--</span>
                 </div>
 
                 <div id="matchIndicatorBadge" class="match-idle w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300">
@@ -257,13 +252,13 @@
 
                 <div class="card-student flex flex-col items-center p-4 rounded-2xl w-5/12">
                     <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--student);">Schüler bietet an:</span>
-                    <span id="activeSchuelerHaben" class="text-2xl font-extrabold mt-1.5 flex items-center gap-2" style="color: var(--student-strong);">--</span>
+                    <span id="activeSchuelerHaben" class="text-xl font-extrabold mt-1.5 flex items-center gap-1 flex-wrap justify-center" style="color: var(--student-strong);">--</span>
                 </div>
             </div>
         </div>
 
         <!-- ==================== LEHRER-BEREICH (UNTEN) ==================== -->
-        <div class="zone-teacher h-[37.5%] w-full rounded-3xl p-4 flex flex-col justify-between relative overflow-hidden">
+        <div class="zone-teacher flex-1 min-h-0 w-full rounded-3xl p-4 flex flex-col justify-between relative overflow-hidden">
 
             <div class="bar-teacher w-full py-1.5 px-3 rounded-xl flex items-center justify-center text-center">
                 <span id="teacherLiveFormula" class="text-sm font-bold tracking-wide flex items-center gap-1.5 justify-center">
@@ -271,48 +266,48 @@
                 </span>
             </div>
 
-            <div class="flex gap-4 items-center justify-between my-auto h-[55%] z-10">
+            <div class="flex gap-3 items-center justify-between flex-1 min-h-0 z-10">
                 <div class="w-1/2 h-full flex flex-col justify-center gap-1 overflow-y-auto">
-                    <div id="taskGrid" class="grid grid-cols-4 gap-2 mb-2"></div>
+                    <div id="taskGrid" class="grid grid-cols-4 gap-1.5 mb-2"></div>
 
                     <div class="flex items-center justify-between mb-1">
-                        <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Genau zwei Optionen freigeben:</span>
+                        <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Genau zwei freigeben:</span>
                         <span id="allowedCountLabel" class="count-pending text-xs px-2 py-0.5 rounded-md font-black">0/2</span>
                     </div>
-                    <div id="allowGrid" class="grid grid-cols-4 gap-2"></div>
+                    <div id="allowGrid" class="grid grid-cols-4 gap-1.5"></div>
                 </div>
 
-                <div class="w-1/2 h-full flex gap-4 items-center justify-end">
-                    <div class="flex flex-col gap-1.5">
-                        <button onclick="toggleTeacherUnit('Aufg')" id="teacherUnitAufgBtn" class="w-14 py-2 text-xs font-bold rounded-xl transition-all">Aufg</button>
-                        <button onclick="toggleTeacherUnit('Min')" id="teacherUnitMinBtn" class="w-14 py-2 text-xs font-bold rounded-xl transition-all">Min</button>
-                    </div>
+                <div class="w-1/2 h-full flex flex-col gap-2 items-center justify-center">
+                    <div class="flex gap-2 items-center justify-center">
+                        <div class="flex flex-col gap-1">
+                            <button onclick="toggleTeacherUnit('Aufg')" id="teacherUnitAufgBtn" class="w-12 py-1.5 text-xs font-bold rounded-lg transition-all">Aufg</button>
+                            <button onclick="toggleTeacherUnit('Min')" id="teacherUnitMinBtn" class="w-12 py-1.5 text-xs font-bold rounded-lg transition-all">Min</button>
+                        </div>
 
-                    <div class="card-teacher flex flex-col items-center justify-center p-2 rounded-2xl w-28 h-full">
-                        <span id="teacherSelectedText" class="text-sm font-black text-center uppercase tracking-wider break-words w-full px-1" style="color: var(--teacher-strong);">Aufgabe</span>
-                    </div>
+                        <div class="card-teacher flex flex-col items-center justify-center p-2 rounded-2xl w-24">
+                            <span id="teacherSelectedText" class="text-xs font-black text-center uppercase tracking-wider break-words w-full px-1" style="color: var(--teacher-strong);">Aufgabe</span>
+                        </div>
 
-                    <div class="flex flex-col items-center">
-                        <div class="draft-teacher rounded-2xl px-5 py-3 text-5xl font-black min-w-[100px] text-center">
+                        <div class="draft-teacher rounded-2xl px-4 py-2 text-4xl font-black min-w-[90px] text-center">
                             <span id="teacherDraft">0</span>
                         </div>
                     </div>
 
-                    <button onclick="commitTeacher()" class="btn-submit-teacher w-16 h-16 rounded-2xl flex items-center justify-center font-black text-3xl active:scale-95 transition-all">
+                    <button onclick="commitTeacher()" class="btn-submit-teacher w-full max-w-[140px] h-12 rounded-2xl flex items-center justify-center font-black text-2xl active:scale-95 transition-all">
                         <i class="fa-solid fa-arrow-up"></i>
                     </button>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center gap-4 h-[25%] z-10 border-t pt-2" style="border-color: var(--teacher-soft-border);">
-                <div id="teacherThumbsUpContainer" class="invisible w-1/4 flex justify-start">
-                    <button onclick="toggleTeacherAccept()" id="teacherThumbsUpBtn" class="thumb-btn px-6 py-2.5 rounded-2xl flex items-center gap-3 font-bold text-lg active:scale-95 transition-all">
-                        <i class="fa-solid fa-thumbs-up text-xl"></i>
+            <div class="flex justify-between items-end gap-3 z-10 shrink-0 border-t pt-2" style="border-color: var(--teacher-soft-border);">
+                <div id="teacherThumbsUpContainer" class="invisible flex justify-start">
+                    <button onclick="toggleTeacherAccept()" id="teacherThumbsUpBtn" class="thumb-btn px-5 py-2 rounded-2xl flex items-center gap-2 font-bold text-base active:scale-95 transition-all">
+                        <i class="fa-solid fa-thumbs-up text-lg"></i>
                         <span>OK!</span>
                     </button>
                 </div>
 
-                <div class="flex-1 flex gap-2 justify-end">
+                <div class="grid grid-cols-3 gap-1.5 ml-auto">
                     <button onclick="pressTeacherKey('1')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">1</button>
                     <button onclick="pressTeacherKey('2')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">2</button>
                     <button onclick="pressTeacherKey('3')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">3</button>
@@ -322,8 +317,8 @@
                     <button onclick="pressTeacherKey('7')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">7</button>
                     <button onclick="pressTeacherKey('8')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">8</button>
                     <button onclick="pressTeacherKey('9')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">9</button>
-                    <button onclick="pressTeacherKey('0')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">0</button>
                     <button onclick="pressTeacherKey('back')" class="key-warn w-14 h-12 rounded-xl font-bold text-base transition-all"><i class="fa-solid fa-delete-left"></i></button>
+                    <button onclick="pressTeacherKey('0')" class="key-btn w-14 h-12 rounded-xl font-bold text-lg transition-colors">0</button>
                     <button onclick="clearTeacherDraft()" class="key-danger w-14 h-12 rounded-xl font-bold text-base transition-all">C</button>
                 </div>
             </div>
@@ -599,8 +594,8 @@
             state.teacherCommitted.allowedRewards.forEach(r => {
                 const isSelected = state.studentRewardId === r.id;
                 const btn = document.createElement('button');
-                btn.className = 'reward-btn p-4 rounded-2xl flex items-center justify-center gap-3 active:scale-95 transition-all' + (isSelected ? ' is-selected' : '');
-                btn.innerHTML = `<span class="text-4xl">${r.emoji}</span><span class="text-xl font-bold">${r.name}</span>`;
+                btn.className = 'reward-btn p-2.5 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all' + (isSelected ? ' is-selected' : '');
+                btn.innerHTML = `<span class="text-2xl">${r.emoji}</span><span class="text-sm font-bold">${r.name}</span>`;
                 btn.onclick = () => selectStudentReward(r.id);
                 elements.studentRewardGrid.appendChild(btn);
             });
@@ -1011,11 +1006,34 @@
             }
         }
 
+        // ==================== AUSRICHTUNG PRÜFEN (per JS, zuverlässiger als CSS 'orientation') ====================
+        function checkOrientation() {
+            const notice = document.getElementById('orientationNotice');
+            const root = document.getElementById('appRoot');
+            // Nur eindeutig breiteres-als-hohes Fenster gilt als "Querformat".
+            // Ein schmales Fenster (z.B. Vorschau, kleines Browserfenster) bleibt immer nutzbar.
+            const isClearlyLandscape = window.innerWidth > window.innerHeight * 1.15;
+
+            if (isClearlyLandscape) {
+                notice.classList.remove('hidden');
+                notice.classList.add('flex');
+                root.style.display = 'none';
+            } else {
+                notice.classList.add('hidden');
+                notice.classList.remove('flex');
+                root.style.display = 'flex';
+            }
+        }
+
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+
         window.onload = function () {
             loadCustomData();
             state.teacherTaskId = state.tasks[0].id;
             updateUI();
             registerResetButton();
+            checkOrientation();
         };
     </script>
 </body>
