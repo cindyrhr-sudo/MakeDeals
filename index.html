@@ -175,10 +175,7 @@
 
     <div id="appRoot" class="h-full w-full flex flex-col justify-between items-stretch relative">
 
-    <!-- Verwaltungs-Button (nur für Lehrkraft, unten rechts fest positioniert) -->
-    <button onclick="openManageModal()" class="gear-btn fixed bottom-3 right-3 z-40 w-11 h-11 rounded-full flex items-center justify-center text-lg">
-        <i class="fa-solid fa-gear"></i>
-    </button>
+    <!-- Verwaltungs-Button ist jetzt im Lehrkraft-Bereich verankert, siehe unten -->
 
     <div id="negotiationScreen" class="h-full w-full flex flex-col justify-between items-stretch transition-all duration-500">
 
@@ -260,6 +257,11 @@
         <!-- ==================== LEHRER-BEREICH (UNTEN) ==================== -->
         <div class="zone-teacher flex-1 min-h-0 w-full rounded-3xl p-4 flex flex-col justify-between relative overflow-hidden">
 
+            <button onclick="openManageModal()" class="gear-btn absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center text-sm">
+                <i class="fa-solid fa-gear"></i>
+            </button>
+
+
             <div class="bar-teacher w-full py-1.5 px-3 rounded-xl flex items-center justify-center text-center">
                 <span id="teacherLiveFormula" class="text-sm font-bold tracking-wide flex items-center gap-1.5 justify-center">
                     Erst Aufgabe wählen ➔ Dann Belohnungen freigeben
@@ -284,8 +286,8 @@
                             <button onclick="toggleTeacherUnit('Min')" id="teacherUnitMinBtn" class="w-12 py-1.5 text-xs font-bold rounded-lg transition-all">Min</button>
                         </div>
 
-                        <div class="card-teacher flex flex-col items-center justify-center p-2 rounded-2xl w-24">
-                            <span id="teacherSelectedText" class="text-xs font-black text-center uppercase tracking-wider break-words w-full px-1" style="color: var(--teacher-strong);">Aufgabe</span>
+                        <div class="card-teacher flex flex-col items-center justify-center p-2 rounded-2xl w-28">
+                            <span id="teacherSelectedText" class="text-xs font-black text-center uppercase break-words w-full px-1 leading-tight" style="color: var(--teacher-strong);">Aufgabe</span>
                         </div>
 
                         <div class="draft-teacher rounded-2xl px-4 py-2 text-4xl font-black min-w-[90px] text-center">
