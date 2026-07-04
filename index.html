@@ -172,6 +172,22 @@
 
         .reset-btn { background: var(--panel); border: 2px solid var(--border); color: var(--ink-dim); }
 
+        .footer-row {
+            border-top-width: 1px;
+            border-top-style: solid;
+            padding-top: 0.5rem;
+            max-height: 60px;
+            opacity: 1;
+            overflow: hidden;
+            transition: max-height 0.25s ease, opacity 0.2s ease, padding-top 0.25s ease, border-color 0.25s ease;
+        }
+        .footer-row.is-collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding-top: 0;
+            border-top-color: transparent;
+        }
+
         .calc-panel {
             background: var(--panel-soft);
             border: 1px solid var(--border-soft);
@@ -417,7 +433,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-start items-center gap-3 z-10 shrink-0 border-t pt-2" style="border-color: var(--student-soft-border);">
+            <div id="studentFooterRow" class="footer-row is-collapsed flex justify-start items-center gap-3 z-10 shrink-0" style="border-color: var(--student-soft-border);">
                 <div id="studentThumbsUpContainer" class="invisible flex justify-start">
                     <button onclick="toggleStudentAccept()" id="studentThumbsUpBtn" class="thumb-btn px-5 py-2 rounded-2xl flex items-center gap-2 font-bold text-base active:scale-95 transition-all">
                         <span class="icon text-lg">👍</span>
@@ -516,7 +532,7 @@
                 </div>
             </div>
 
-            <div class="flex justify-start items-center gap-3 z-10 shrink-0 border-t pt-2" style="border-color: var(--teacher-soft-border);">
+            <div id="teacherFooterRow" class="footer-row is-collapsed flex justify-start items-center gap-3 z-10 shrink-0" style="border-color: var(--teacher-soft-border);">
                 <div id="teacherThumbsUpContainer" class="invisible flex justify-start">
                     <button onclick="toggleTeacherAccept()" id="teacherThumbsUpBtn" class="thumb-btn px-5 py-2 rounded-2xl flex items-center gap-2 font-bold text-base active:scale-95 transition-all">
                         <span class="icon text-lg">👍</span>
@@ -703,6 +719,7 @@
             studentDraft: document.getElementById('studentDraft'),
             studentUnitIndicator: document.getElementById('studentUnitIndicator'),
             studentThumbsUpContainer: document.getElementById('studentThumbsUpContainer'),
+            studentFooterRow: document.getElementById('studentFooterRow'),
             studentThumbsUpBtn: document.getElementById('studentThumbsUpBtn'),
             studentLiveFormula: document.getElementById('studentLiveFormula'),
             studentRewardGrid: document.getElementById('studentRewardGrid'),
@@ -722,6 +739,7 @@
             teacherUnitMinBtn: document.getElementById('teacherUnitMinBtn'),
             allowedCountLabel: document.getElementById('allowedCountLabel'),
             teacherThumbsUpContainer: document.getElementById('teacherThumbsUpContainer'),
+            teacherFooterRow: document.getElementById('teacherFooterRow'),
             teacherThumbsUpBtn: document.getElementById('teacherThumbsUpBtn'),
             teacherLiveFormula: document.getElementById('teacherLiveFormula'),
 
@@ -986,11 +1004,15 @@
                 elements.matchIcon.className = "icon text-2xl";
                 elements.teacherThumbsUpContainer.classList.remove('invisible');
                 elements.studentThumbsUpContainer.classList.remove('invisible');
+                elements.teacherFooterRow.classList.remove('is-collapsed');
+                elements.studentFooterRow.classList.remove('is-collapsed');
             } else {
                 elements.matchIndicatorBadge.className = "match-idle w-14 h-14 rounded-full flex items-center justify-center transition-all";
                 elements.matchIcon.className = "icon text-2xl opacity-40";
                 elements.teacherThumbsUpContainer.classList.add('invisible');
                 elements.studentThumbsUpContainer.classList.add('invisible');
+                elements.teacherFooterRow.classList.add('is-collapsed');
+                elements.studentFooterRow.classList.add('is-collapsed');
             }
 
             updateAcceptButtons();
