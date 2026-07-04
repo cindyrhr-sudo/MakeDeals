@@ -8,8 +8,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#1f2124">
     <title>Lern-Deal - Kooperative iPad App</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Kein externes CDN mehr: alle Styles und Icons sind unten im <style>-Block enthalten,
+         damit die App auch ohne Internet/im Schul-WLAN zuverlässig funktioniert. -->
     <style>
         :root {
             --bg: #1f2124;
@@ -21,32 +21,34 @@
             --ink-dim: #9a9c9f;
             --ink-faint: #6d6f72;
 
-            --teacher: #93b6bd;
-            --teacher-strong: #b3d0d5;
-            --teacher-fill: #35494e;
-            --teacher-border: #547077;
-            --teacher-soft-bg: rgba(147, 182, 189, 0.07);
-            --teacher-soft-border: rgba(147, 182, 189, 0.20);
+            /* Lehrkraft: gedecktes, migränefreundliches Grün */
+            --teacher: #9cbd90;
+            --teacher-strong: #bfd8b3;
+            --teacher-fill: #384a30;
+            --teacher-border: #5f7853;
+            --teacher-soft-bg: rgba(156, 189, 144, 0.07);
+            --teacher-soft-border: rgba(156, 189, 144, 0.20);
 
-            --student: #a4c199;
-            --student-strong: #c0d8b7;
-            --student-fill: #3c4c36;
-            --student-border: #61805a;
-            --student-soft-bg: rgba(164, 193, 153, 0.07);
-            --student-soft-border: rgba(164, 193, 153, 0.20);
+            /* Schüler: gedecktes, migränefreundliches Terracotta-Rot (kein reines/knalliges Rot) */
+            --student: #c69787;
+            --student-strong: #ddbaac;
+            --student-fill: #4a352d;
+            --student-border: #8a6455;
+            --student-soft-bg: rgba(198, 151, 135, 0.07);
+            --student-soft-border: rgba(198, 151, 135, 0.20);
 
             --warn: #c7a273;
             --warn-fill: #4a3d2b;
             --warn-border: #6b5a3d;
 
-            --danger: #bd8377;
-            --danger-fill: #493430;
-            --danger-border: #6b4c44;
+            --danger: #a67d84;
+            --danger-fill: #40302f;
+            --danger-border: #664d52;
 
             --gold: #ccb37c;
         }
 
-        html, body { height: 100%; width: 100%; }
+        html, body { height: 100%; width: 100%; margin: 0; padding: 0; }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
@@ -129,8 +131,9 @@
         .allow-btn { background: var(--panel); border: 1px solid var(--border); color: var(--ink-dim); }
         .allow-btn.is-active { background: var(--teacher-fill); border-color: var(--teacher-border); color: var(--teacher-strong); }
 
-        .reward-btn { background: var(--panel); border: 2px solid var(--border-soft); opacity: 0.35; }
+        .reward-btn { background: var(--panel); border: 2px solid var(--border-soft); opacity: 1; }
         .reward-btn.is-selected { border-color: var(--student-border); opacity: 1; background: var(--student-fill); }
+        .reward-btn.is-dimmed { opacity: 0.35; }
 
         .thumb-btn { background: var(--panel); border: 1px solid var(--border); color: var(--ink-dim); }
         .thumb-btn.is-accepted-teacher { background: var(--teacher-fill); border-color: var(--teacher-border); color: var(--teacher-strong); }
@@ -224,12 +227,12 @@
                     </button>
                 </div>
 
-                <!-- Belohnungsauswahl: restlicher Platz -->
-                <div class="w-2/3 h-full flex flex-col justify-center">
-                    <div id="studentRewardPlaceholder" class="text-sm font-bold text-center py-3 rounded-2xl" style="color: var(--ink-faint); background: var(--panel-soft); border: 1px solid var(--border-soft);">
+                <!-- Belohnungsauswahl: restlicher Platz, eine zusammenhängende Box -->
+                <div class="calc-panel w-2/3 h-full flex flex-col justify-center gap-3">
+                    <div id="studentRewardPlaceholder" class="text-sm font-bold text-center py-3 rounded-2xl" style="color: var(--ink-faint); background: var(--panel); border: 1px solid var(--border-soft);">
                         Warte auf Lehrer-Freigabe...
                     </div>
-                    <div id="studentRewardGrid" class="hidden grid grid-cols-2 gap-2"></div>
+                    <div id="studentRewardGrid" class="hidden grid gap-2" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));"></div>
                 </div>
             </div>
 
@@ -257,7 +260,7 @@
                     <i id="matchIcon" class="fa-solid fa-thumbs-up text-2xl opacity-40"></i>
                 </div>
 
-                <div class="card-student flex flex-col items-center p-4 rounded-2xl w-5/12">
+                <div class="card-student upside-down flex flex-col items-center p-4 rounded-2xl w-5/12">
                     <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--student);">Schüler bietet an:</span>
                     <span id="activeSchuelerHaben" class="text-xl font-extrabold mt-1.5 flex items-center gap-1 flex-wrap justify-center" style="color: var(--student-strong);">--</span>
                 </div>
@@ -307,8 +310,8 @@
                     </button>
                 </div>
 
-                <!-- Aufgaben- und Belohnungsauswahl: restlicher Platz -->
-                <div class="w-2/3 h-full flex flex-col gap-1.5 overflow-y-auto">
+                <!-- Aufgaben- und Belohnungsauswahl: restlicher Platz, eine zusammenhängende Box -->
+                <div class="calc-panel w-2/3 h-full flex flex-col gap-3 overflow-y-auto">
                     <div class="flex items-center gap-2">
                         <div class="flex gap-1 shrink-0">
                             <button onclick="toggleTeacherUnit('Aufg')" id="teacherUnitAufgBtn" class="w-12 py-1.5 text-xs font-bold rounded-lg transition-all">Aufg</button>
@@ -317,13 +320,18 @@
                         <span class="text-xs font-bold uppercase tracking-wide flex-1 text-right" style="color: var(--ink-faint);">Wird gerade gefordert</span>
                     </div>
 
-                    <div id="taskGrid" class="grid grid-cols-4 gap-1.5"></div>
-
-                    <div class="flex items-center justify-between mt-1">
-                        <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Genau zwei freigeben:</span>
-                        <span id="allowedCountLabel" class="count-pending text-xs px-2 py-0.5 rounded-md font-black">0/2</span>
+                    <div class="flex flex-col gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Aufgabe wählen:</span>
+                        <div id="taskGrid" class="grid gap-2" style="grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));"></div>
                     </div>
-                    <div id="allowGrid" class="grid grid-cols-4 gap-1.5"></div>
+
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Genau zwei freigeben:</span>
+                            <span id="allowedCountLabel" class="count-pending text-xs px-2 py-0.5 rounded-md font-black">0/2</span>
+                        </div>
+                        <div id="allowGrid" class="grid gap-2" style="grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));"></div>
+                    </div>
                 </div>
             </div>
 
@@ -606,8 +614,11 @@
 
             state.teacherCommitted.allowedRewards.forEach(r => {
                 const isSelected = state.studentRewardId === r.id;
+                const hasSelection = !!state.studentRewardId;
                 const btn = document.createElement('button');
-                btn.className = 'reward-btn p-2.5 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all' + (isSelected ? ' is-selected' : '');
+                btn.className = 'reward-btn p-2.5 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all'
+                    + (isSelected ? ' is-selected' : '')
+                    + (hasSelection && !isSelected ? ' is-dimmed' : '');
                 btn.innerHTML = `<span class="text-2xl">${r.emoji}</span><span class="text-sm font-bold">${r.name}</span>`;
                 btn.onclick = () => selectStudentReward(r.id);
                 elements.studentRewardGrid.appendChild(btn);
@@ -910,25 +921,17 @@
             updateUI();
         }
 
-        // ==================== ZUSTIMMUNG ====================
+        // ==================== ZUSTIMMUNG (EINE SEITE REICHT) ====================
         function toggleTeacherAccept() {
             if (!state.teacherCommitted || !state.studentCommitted) return;
-            state.teacherAccepted = !state.teacherAccepted;
-            updateUI();
-            checkDealConditions();
+            state.teacherAccepted = true;
+            triggerFinalDeal();
         }
 
         function toggleStudentAccept() {
             if (!state.teacherCommitted || !state.studentCommitted) return;
-            state.studentAccepted = !state.studentAccepted;
-            updateUI();
-            checkDealConditions();
-        }
-
-        function checkDealConditions() {
-            if (state.teacherAccepted && state.studentAccepted) {
-                triggerFinalDeal();
-            }
+            state.studentAccepted = true;
+            triggerFinalDeal();
         }
 
         function triggerFinalDeal() {
