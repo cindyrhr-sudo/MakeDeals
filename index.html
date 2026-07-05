@@ -225,6 +225,7 @@
         .flex-wrap { flex-wrap: wrap; }
         .flex-1 { flex: 1 1 0%; }
         .flex-2 { flex: 2 1 0%; }
+        .flex-15 { flex: 1.5 1 0%; }
         .shrink-0 { flex-shrink: 0; }
         .min-h-0 { min-height: 0; }
         .grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -387,7 +388,7 @@
     <div id="negotiationScreen" class="h-full w-full flex flex-col justify-between items-stretch transition-all duration-500">
 
         <!-- ==================== SCHÜLER-BEREICH (OBEN - 180° gedreht) ==================== -->
-        <div class="zone-student flex-1 min-h-0 w-full rounded-3xl p-4 flex flex-col justify-between upside-down relative overflow-hidden">
+        <div class="zone-student flex-15 min-h-0 w-full rounded-3xl p-4 flex flex-col justify-between upside-down relative overflow-hidden">
 
             <div class="bar-student w-full py-1.5 px-3 rounded-xl flex items-center justify-center text-center">
                 <span id="studentLiveFormula" class="text-sm font-bold tracking-wide flex items-center gap-1.5 justify-center">
@@ -395,149 +396,128 @@
                 </span>
             </div>
 
-            <div class="flex gap-3 flex-1 min-h-0 z-10">
+            <div class="flex gap-4 flex-1 min-h-0 z-10">
 
                 <!-- "Taschenrechner": Anzeige, Tastatur und Senden optisch als eine Einheit -->
-                <div class="calc-panel flex-1 h-full flex flex-col gap-1.5" style="min-width: 0;">
-                    <div class="draft-student rounded-xl px-3 py-1.5 flex flex-col items-end justify-center shrink-0">
-                        <span id="studentUnitIndicator" class="text-[10px] font-bold uppercase tracking-wide opacity-70">--</span>
-                        <span id="studentDraft" class="text-3xl font-black leading-none">0</span>
+                <div class="calc-panel flex-1 h-full flex flex-col gap-2" style="min-width: 0;">
+                    <div class="draft-student rounded-xl px-3 py-2 flex flex-col items-end justify-center shrink-0">
+                        <span id="studentUnitIndicator" class="text-xs font-bold uppercase tracking-wide opacity-70">--</span>
+                        <span id="studentDraft" class="text-4xl font-black leading-none">0</span>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-1.5 flex-1 min-h-0" style="grid-template-rows: repeat(4, minmax(0,1fr));">
-                        <button onclick="pressStudentKey('7')" class="key-btn rounded-lg font-bold text-base transition-colors">7</button>
-                        <button onclick="pressStudentKey('8')" class="key-btn rounded-lg font-bold text-base transition-colors">8</button>
-                        <button onclick="pressStudentKey('9')" class="key-btn rounded-lg font-bold text-base transition-colors">9</button>
-                        <button onclick="pressStudentKey('4')" class="key-btn rounded-lg font-bold text-base transition-colors">4</button>
-                        <button onclick="pressStudentKey('5')" class="key-btn rounded-lg font-bold text-base transition-colors">5</button>
-                        <button onclick="pressStudentKey('6')" class="key-btn rounded-lg font-bold text-base transition-colors">6</button>
-                        <button onclick="pressStudentKey('1')" class="key-btn rounded-lg font-bold text-base transition-colors">1</button>
-                        <button onclick="pressStudentKey('2')" class="key-btn rounded-lg font-bold text-base transition-colors">2</button>
-                        <button onclick="pressStudentKey('3')" class="key-btn rounded-lg font-bold text-base transition-colors">3</button>
-                        <button onclick="pressStudentKey('back')" class="key-warn rounded-lg font-bold text-sm transition-all"><span class="icon">⌫</span></button>
-                        <button onclick="pressStudentKey('0')" class="key-btn rounded-lg font-bold text-base transition-colors">0</button>
-                        <button onclick="clearStudentDraft()" class="key-danger rounded-lg font-bold text-sm transition-all">C</button>
+                    <div class="grid grid-cols-3 gap-2 flex-1 min-h-0" style="grid-template-rows: repeat(4, minmax(0,1fr));">
+                        <button onclick="pressStudentKey('7')" class="key-btn rounded-lg font-bold text-lg transition-colors">7</button>
+                        <button onclick="pressStudentKey('8')" class="key-btn rounded-lg font-bold text-lg transition-colors">8</button>
+                        <button onclick="pressStudentKey('9')" class="key-btn rounded-lg font-bold text-lg transition-colors">9</button>
+                        <button onclick="pressStudentKey('4')" class="key-btn rounded-lg font-bold text-lg transition-colors">4</button>
+                        <button onclick="pressStudentKey('5')" class="key-btn rounded-lg font-bold text-lg transition-colors">5</button>
+                        <button onclick="pressStudentKey('6')" class="key-btn rounded-lg font-bold text-lg transition-colors">6</button>
+                        <button onclick="pressStudentKey('1')" class="key-btn rounded-lg font-bold text-lg transition-colors">1</button>
+                        <button onclick="pressStudentKey('2')" class="key-btn rounded-lg font-bold text-lg transition-colors">2</button>
+                        <button onclick="pressStudentKey('3')" class="key-btn rounded-lg font-bold text-lg transition-colors">3</button>
+                        <button onclick="pressStudentKey('back')" class="key-warn rounded-lg font-bold text-base transition-all"><span class="icon">⌫</span></button>
+                        <button onclick="pressStudentKey('0')" class="key-btn rounded-lg font-bold text-lg transition-colors">0</button>
+                        <button onclick="clearStudentDraft()" class="key-danger rounded-lg font-bold text-base transition-all">C</button>
                     </div>
 
-                    <button onclick="commitStudent()" class="btn-submit-student rounded-xl flex items-center justify-center font-black text-lg active:scale-95 transition-all shrink-0 py-2">
+                    <button onclick="commitStudent()" class="btn-submit-student rounded-xl flex items-center justify-center font-black text-xl active:scale-95 transition-all shrink-0 py-2.5">
                         <span class="icon rotate-180">↓</span>
                     </button>
                 </div>
 
                 <!-- Belohnungsauswahl: restlicher Platz, eine zusammenhängende Box -->
-                <div class="calc-panel flex-2 h-full flex flex-col justify-center gap-3" style="min-width: 0;">
+                <div class="calc-panel flex-2 h-full flex flex-col justify-center gap-4" style="min-width: 0;">
                     <div id="studentRewardPlaceholder" class="text-sm font-bold text-center py-3 rounded-2xl" style="color: var(--ink-faint); background: var(--panel); border: 1px solid var(--border-soft);">
                         Warte auf Lehrer-Freigabe...
                     </div>
-                    <div id="studentRewardGrid" class="hidden grid gap-2" style="grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));"></div>
-                </div>
-            </div>
-
-            <div id="studentFooterRow" class="footer-row is-collapsed flex justify-start items-center gap-3 z-10 shrink-0" style="border-color: var(--student-soft-border);">
-                <div id="studentThumbsUpContainer" class="invisible flex justify-start">
-                    <button onclick="toggleStudentAccept()" id="studentThumbsUpBtn" class="thumb-btn px-5 py-2 rounded-2xl flex items-center gap-2 font-bold text-base active:scale-95 transition-all">
-                        <span class="icon text-lg">👍</span>
-                        <span>OK!</span>
-                    </button>
+                    <div id="studentRewardGrid" class="hidden grid gap-3" style="grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));"></div>
                 </div>
             </div>
         </div>
 
 
         <!-- ==================== MITTLERES VERHANDLUNGSFELD ==================== -->
-        <div class="zone-middle shrink-0 w-full flex flex-col justify-center items-center p-3 relative z-20 upside-down">
+        <div class="zone-middle shrink-0 w-full flex flex-col justify-center items-center p-5 relative z-20 upside-down">
 
             <div class="z-10 flex w-full justify-around items-center my-auto">
-                <div class="card-teacher flex flex-col items-center p-4 rounded-2xl w-5/12">
+                <div class="card-teacher flex flex-col items-center p-5 rounded-2xl w-5/12">
                     <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Lehrkraft fordert:</span>
-                    <span id="activeLehrerSoll" class="text-xl font-extrabold mt-1.5 flex items-center gap-1 flex-wrap justify-center" style="color: var(--teacher-strong);">--</span>
+                    <span id="activeLehrerSoll" class="text-2xl font-extrabold mt-1.5 flex items-center gap-1 flex-wrap justify-center" style="color: var(--teacher-strong);">--</span>
                 </div>
 
-                <div id="matchIndicatorBadge" class="match-idle w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300">
-                    <span id="matchIcon" class="icon text-2xl opacity-40">👍</span>
-                </div>
+                <button id="matchIndicatorBadge" onclick="tryTriggerDeal()" class="match-idle w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300">
+                    <span id="matchIcon" class="icon text-4xl opacity-40">👍</span>
+                </button>
 
-                <div class="card-student upside-down flex flex-col items-center p-4 rounded-2xl w-5/12">
+                <div class="card-student upside-down flex flex-col items-center p-5 rounded-2xl w-5/12">
                     <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--student);">Schüler bietet an:</span>
-                    <span id="activeSchuelerHaben" class="text-xl font-extrabold mt-1.5 flex items-center gap-1 flex-wrap justify-center" style="color: var(--student-strong);">--</span>
+                    <span id="activeSchuelerHaben" class="text-2xl font-extrabold mt-1.5 flex items-center gap-1 flex-wrap justify-center" style="color: var(--student-strong);">--</span>
                 </div>
             </div>
         </div>
 
         <!-- ==================== LEHRER-BEREICH (UNTEN) ==================== -->
-        <div class="zone-teacher flex-1 min-h-0 w-full rounded-3xl p-4 flex flex-col justify-between relative overflow-hidden">
+        <div class="zone-teacher flex-1 min-h-0 w-full rounded-3xl p-3 flex flex-col justify-between relative overflow-hidden">
 
-            <button onclick="openManageModal()" class="gear-btn absolute top-2 right-2 z-10 w-8 h-8 rounded-full flex items-center justify-center text-sm">
+            <button onclick="openManageModal()" class="gear-btn absolute top-1.5 right-1.5 z-10 w-7 h-7 rounded-full flex items-center justify-center text-xs">
                 <span class="icon">⚙</span>
             </button>
 
 
-            <div class="bar-teacher w-full py-1.5 px-3 rounded-xl flex items-center justify-center text-center">
-                <span id="teacherLiveFormula" class="text-sm font-bold tracking-wide flex items-center gap-1.5 justify-center">
+            <div class="bar-teacher w-full py-1 px-3 rounded-lg flex items-center justify-center text-center">
+                <span id="teacherLiveFormula" class="text-xs font-bold tracking-wide flex items-center gap-1.5 justify-center">
                     Erst Aufgabe wählen ➔ Dann Belohnungen freigeben
                 </span>
             </div>
 
-            <div class="flex gap-3 flex-1 min-h-0 z-10">
+            <div class="flex gap-2 flex-1 min-h-0 z-10">
 
-                <!-- "Taschenrechner": Anzeige, Tastatur und Senden optisch als eine Einheit -->
-                <div class="calc-panel flex-1 h-full flex flex-col gap-1.5" style="min-width: 0;">
-                    <div class="draft-teacher rounded-xl px-3 py-1.5 flex flex-col items-end justify-center shrink-0">
-                        <span id="teacherSelectedText" class="text-[10px] font-bold uppercase tracking-wide opacity-70 w-full text-right truncate">Aufgabe</span>
-                        <span id="teacherDraft" class="text-3xl font-black leading-none">0</span>
+                <!-- Taschenrechner: kompakt, für die Lehrkraft reicht wenig Platz -->
+                <div class="calc-panel flex-1 h-full flex flex-col gap-1" style="min-width: 0;">
+                    <div class="draft-teacher rounded-lg px-2 py-1 flex flex-col items-end justify-center shrink-0">
+                        <span id="teacherSelectedText" class="text-[9px] font-bold uppercase tracking-wide opacity-70 w-full text-right truncate">Aufgabe</span>
+                        <span id="teacherDraft" class="text-xl font-black leading-none">0</span>
                     </div>
 
-                    <div class="grid grid-cols-3 gap-1.5 flex-1 min-h-0" style="grid-template-rows: repeat(4, minmax(0,1fr));">
-                        <button onclick="pressTeacherKey('7')" class="key-btn rounded-lg font-bold text-base transition-colors">7</button>
-                        <button onclick="pressTeacherKey('8')" class="key-btn rounded-lg font-bold text-base transition-colors">8</button>
-                        <button onclick="pressTeacherKey('9')" class="key-btn rounded-lg font-bold text-base transition-colors">9</button>
-                        <button onclick="pressTeacherKey('4')" class="key-btn rounded-lg font-bold text-base transition-colors">4</button>
-                        <button onclick="pressTeacherKey('5')" class="key-btn rounded-lg font-bold text-base transition-colors">5</button>
-                        <button onclick="pressTeacherKey('6')" class="key-btn rounded-lg font-bold text-base transition-colors">6</button>
-                        <button onclick="pressTeacherKey('1')" class="key-btn rounded-lg font-bold text-base transition-colors">1</button>
-                        <button onclick="pressTeacherKey('2')" class="key-btn rounded-lg font-bold text-base transition-colors">2</button>
-                        <button onclick="pressTeacherKey('3')" class="key-btn rounded-lg font-bold text-base transition-colors">3</button>
-                        <button onclick="pressTeacherKey('back')" class="key-warn rounded-lg font-bold text-sm transition-all"><span class="icon">⌫</span></button>
-                        <button onclick="pressTeacherKey('0')" class="key-btn rounded-lg font-bold text-base transition-colors">0</button>
-                        <button onclick="clearTeacherDraft()" class="key-danger rounded-lg font-bold text-sm transition-all">C</button>
+                    <div class="grid grid-cols-3 gap-1 flex-1 min-h-0" style="grid-template-rows: repeat(4, minmax(0,1fr));">
+                        <button onclick="pressTeacherKey('7')" class="key-btn rounded-md font-bold text-xs transition-colors">7</button>
+                        <button onclick="pressTeacherKey('8')" class="key-btn rounded-md font-bold text-xs transition-colors">8</button>
+                        <button onclick="pressTeacherKey('9')" class="key-btn rounded-md font-bold text-xs transition-colors">9</button>
+                        <button onclick="pressTeacherKey('4')" class="key-btn rounded-md font-bold text-xs transition-colors">4</button>
+                        <button onclick="pressTeacherKey('5')" class="key-btn rounded-md font-bold text-xs transition-colors">5</button>
+                        <button onclick="pressTeacherKey('6')" class="key-btn rounded-md font-bold text-xs transition-colors">6</button>
+                        <button onclick="pressTeacherKey('1')" class="key-btn rounded-md font-bold text-xs transition-colors">1</button>
+                        <button onclick="pressTeacherKey('2')" class="key-btn rounded-md font-bold text-xs transition-colors">2</button>
+                        <button onclick="pressTeacherKey('3')" class="key-btn rounded-md font-bold text-xs transition-colors">3</button>
+                        <button onclick="pressTeacherKey('back')" class="key-warn rounded-md font-bold text-xs transition-all"><span class="icon">⌫</span></button>
+                        <button onclick="pressTeacherKey('0')" class="key-btn rounded-md font-bold text-xs transition-colors">0</button>
+                        <button onclick="clearTeacherDraft()" class="key-danger rounded-md font-bold text-xs transition-all">C</button>
                     </div>
 
-                    <button onclick="commitTeacher()" class="btn-submit-teacher rounded-xl flex items-center justify-center font-black text-lg active:scale-95 transition-all shrink-0 py-2">
+                    <button onclick="commitTeacher()" class="btn-submit-teacher rounded-lg flex items-center justify-center font-black text-sm active:scale-95 transition-all shrink-0 py-1">
                         <span class="icon">↑</span>
                     </button>
                 </div>
 
-                <!-- Aufgaben- und Belohnungsauswahl: restlicher Platz, eine zusammenhängende Box -->
-                <div class="calc-panel flex-2 h-full flex flex-col gap-3 overflow-y-auto" style="min-width: 0;">
-                    <div class="flex items-center gap-2">
-                        <div class="flex gap-1 shrink-0">
-                            <button onclick="toggleTeacherUnit('⁉Aufgaben')" id="teacherUnitAufgBtn" class="w-15 py-1.5 text-xs font-bold rounded-lg transition-all">Aufgaben ⁉</button>
-                            <button onclick="toggleTeacherUnit('🕓Minuten')" id="teacherUnitMinBtn" class="w-15 py-1.5 text-xs font-bold rounded-lg transition-all">Minuten🕓</button>
-                        </div>
-                        <span class="text-xs font-bold uppercase tracking-wide flex-1 text-right" style="color: var(--ink-faint);">Wird gerade gefordert</span>
+                <!-- Aufgaben- und Belohnungsauswahl: nur Text, so knapp wie möglich -->
+                <div class="calc-panel flex-2 h-full flex flex-col gap-2 overflow-y-auto" style="min-width: 0;">
+                    <div class="flex gap-1 shrink-0">
+                        <button onclick="toggleTeacherUnit('Aufgaben ⁉')" id="teacherUnitAufgBtn" class="w-11 py-1 text-[11px] font-bold rounded-md transition-all">Aufgaben ⁉</button>
+                        <button onclick="toggleTeacherUnit('Minuten 🕓')" id="teacherUnitMinBtn" class="w-11 py-1 text-[11px] font-bold rounded-md transition-all">Minuten 🕓</button>
                     </div>
 
-                    <div class="flex flex-col gap-2">
-                        <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Aufgabe wählen:</span>
-                        <div id="taskGrid" class="grid gap-2" style="grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));"></div>
+                    <div class="flex flex-col gap-1.5">
+                        <span class="text-[11px] font-bold uppercase tracking-wider" style="color: var(--teacher);">Aufgabe:</span>
+                        <div id="taskGrid" class="grid gap-1.5" style="grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));"></div>
                     </div>
 
-                    <div class="flex flex-col gap-2">
+                    <div class="flex flex-col gap-1.5">
                         <div class="flex items-center justify-between">
-                            <span class="text-xs font-bold uppercase tracking-wider" style="color: var(--teacher);">Belohnungen freigeben:</span>
-                            <span id="allowedCountLabel" class="count-pending text-xs px-2 py-0.5 rounded-md font-black">0 ausgewählt</span>
+                            <span class="text-[11px] font-bold uppercase tracking-wider" style="color: var(--teacher);">Belohnungen:</span>
+                            <span id="allowedCountLabel" class="count-pending text-[11px] px-1.5 py-0.5 rounded-md font-black">0 ausgewählt</span>
                         </div>
-                        <div id="allowGrid" class="grid gap-2" style="grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));"></div>
+                        <div id="allowGrid" class="grid gap-1.5" style="grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));"></div>
                     </div>
-                </div>
-            </div>
-
-            <div id="teacherFooterRow" class="footer-row is-collapsed flex justify-start items-center gap-3 z-10 shrink-0" style="border-color: var(--teacher-soft-border);">
-                <div id="teacherThumbsUpContainer" class="invisible flex justify-start">
-                    <button onclick="toggleTeacherAccept()" id="teacherThumbsUpBtn" class="thumb-btn px-5 py-2 rounded-2xl flex items-center gap-2 font-bold text-base active:scale-95 transition-all">
-                        <span class="icon text-lg">👍</span>
-                        <span>OK!</span>
-                    </button>
                 </div>
             </div>
         </div>
@@ -718,9 +698,6 @@
         const elements = {
             studentDraft: document.getElementById('studentDraft'),
             studentUnitIndicator: document.getElementById('studentUnitIndicator'),
-            studentThumbsUpContainer: document.getElementById('studentThumbsUpContainer'),
-            studentFooterRow: document.getElementById('studentFooterRow'),
-            studentThumbsUpBtn: document.getElementById('studentThumbsUpBtn'),
             studentLiveFormula: document.getElementById('studentLiveFormula'),
             studentRewardGrid: document.getElementById('studentRewardGrid'),
             studentRewardPlaceholder: document.getElementById('studentRewardPlaceholder'),
@@ -738,9 +715,6 @@
             teacherUnitAufgBtn: document.getElementById('teacherUnitAufgBtn'),
             teacherUnitMinBtn: document.getElementById('teacherUnitMinBtn'),
             allowedCountLabel: document.getElementById('allowedCountLabel'),
-            teacherThumbsUpContainer: document.getElementById('teacherThumbsUpContainer'),
-            teacherFooterRow: document.getElementById('teacherFooterRow'),
-            teacherThumbsUpBtn: document.getElementById('teacherThumbsUpBtn'),
             teacherLiveFormula: document.getElementById('teacherLiveFormula'),
 
             dealScreen: document.getElementById('dealScreen'),
@@ -788,8 +762,8 @@
             elements.taskGrid.innerHTML = '';
             state.tasks.forEach(t => {
                 const btn = document.createElement('button');
-                btn.className = 'task-btn py-3 rounded-xl text-sm font-bold transition-all' + (t.id === state.teacherTaskId ? ' is-active' : '');
-                btn.innerHTML = `<span class="text-lg mr-1">${t.emoji}</span>${t.name}`;
+                btn.className = 'task-btn py-2 rounded-lg text-xs font-bold transition-all' + (t.id === state.teacherTaskId ? ' is-active' : '');
+                btn.textContent = t.name;
                 btn.onclick = () => selectTask(t.id);
                 elements.taskGrid.appendChild(btn);
             });
@@ -800,8 +774,8 @@
             state.rewards.forEach(r => {
                 const isActive = state.teacherAllowedRewards.some(a => a.id === r.id);
                 const btn = document.createElement('button');
-                btn.className = 'allow-btn py-3 rounded-xl text-sm font-bold transition-all' + (isActive ? ' is-active' : '');
-                btn.innerHTML = `<span class="text-lg mr-1">${r.emoji}</span>${r.name}`;
+                btn.className = 'allow-btn py-2 rounded-lg text-xs font-bold transition-all' + (isActive ? ' is-active' : '');
+                btn.textContent = r.name;
                 btn.onclick = () => toggleAllowedReward(r.id);
                 elements.allowGrid.appendChild(btn);
             });
@@ -815,10 +789,10 @@
                 const isSelected = state.studentRewardId === r.id;
                 const hasSelection = !!state.studentRewardId;
                 const btn = document.createElement('button');
-                btn.className = 'reward-btn p-2.5 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all'
+                btn.className = 'reward-btn p-3 rounded-2xl flex items-center justify-center gap-2 active:scale-95 transition-all'
                     + (isSelected ? ' is-selected' : '')
                     + (hasSelection && !isSelected ? ' is-dimmed' : '');
-                btn.innerHTML = `<span class="text-2xl">${r.emoji}</span><span class="text-sm font-bold">${r.name}</span>`;
+                btn.innerHTML = `<span class="text-3xl">${r.emoji}</span><span class="text-base font-bold">${r.name}</span>`;
                 btn.onclick = () => selectStudentReward(r.id);
                 elements.studentRewardGrid.appendChild(btn);
             });
@@ -1000,29 +974,18 @@
             }
 
             if (state.teacherCommitted && state.studentCommitted) {
-                elements.matchIndicatorBadge.className = "match-ready breathing w-14 h-14 rounded-full flex items-center justify-center transition-all cursor-pointer";
-                elements.matchIcon.className = "icon text-2xl";
-                elements.teacherThumbsUpContainer.classList.remove('invisible');
-                elements.studentThumbsUpContainer.classList.remove('invisible');
-                elements.teacherFooterRow.classList.remove('is-collapsed');
-                elements.studentFooterRow.classList.remove('is-collapsed');
+                elements.matchIndicatorBadge.className = "match-ready breathing w-20 h-20 rounded-full flex items-center justify-center transition-all cursor-pointer";
+                elements.matchIcon.className = "icon text-4xl";
             } else {
-                elements.matchIndicatorBadge.className = "match-idle w-14 h-14 rounded-full flex items-center justify-center transition-all";
-                elements.matchIcon.className = "icon text-2xl opacity-40";
-                elements.teacherThumbsUpContainer.classList.add('invisible');
-                elements.studentThumbsUpContainer.classList.add('invisible');
-                elements.teacherFooterRow.classList.add('is-collapsed');
-                elements.studentFooterRow.classList.add('is-collapsed');
+                elements.matchIndicatorBadge.className = "match-idle w-20 h-20 rounded-full flex items-center justify-center transition-all";
+                elements.matchIcon.className = "icon text-4xl opacity-40";
             }
-
-            updateAcceptButtons();
         }
 
-        function updateAcceptButtons() {
-            elements.teacherThumbsUpBtn.className = "thumb-btn px-6 py-2.5 rounded-2xl flex items-center gap-3 font-bold text-lg active:scale-95 transition-all"
-                + (state.teacherAccepted ? " is-accepted-teacher" : "");
-            elements.studentThumbsUpBtn.className = "thumb-btn px-6 py-2.5 rounded-2xl flex items-center gap-3 font-bold text-lg active:scale-95 transition-all"
-                + (state.studentAccepted ? " is-accepted-student" : "");
+        // Zentraler Deal-Button in der Mitte: ein Tap genügt, sobald beide ein Angebot gemacht haben
+        function tryTriggerDeal() {
+            if (!state.teacherCommitted || !state.studentCommitted) return;
+            triggerFinalDeal();
         }
 
         // ==================== SCHÜLER INTERAKTIONEN ====================
@@ -1123,19 +1086,6 @@
 
             state.teacherAccepted = false;
             updateUI();
-        }
-
-        // ==================== ZUSTIMMUNG (EINE SEITE REICHT) ====================
-        function toggleTeacherAccept() {
-            if (!state.teacherCommitted || !state.studentCommitted) return;
-            state.teacherAccepted = true;
-            triggerFinalDeal();
-        }
-
-        function toggleStudentAccept() {
-            if (!state.teacherCommitted || !state.studentCommitted) return;
-            state.studentAccepted = true;
-            triggerFinalDeal();
         }
 
         function triggerFinalDeal() {
